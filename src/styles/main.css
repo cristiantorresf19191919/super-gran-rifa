@@ -631,46 +631,51 @@ body {
   transform: scale(1.05);
 }
 
-/* Footer confirm bar */
+/* Footer confirm bar — stacked vertically for no clipping */
 .number-sheet-footer {
-  padding: 14px 20px;
-  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  padding: 16px 20px;
+  padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
   border-top: 1px solid rgba(255,255,255,0.08);
   background: linear-gradient(180deg, rgba(15,30,50,0.98), rgba(10,20,35,0.99));
   display: flex;
+  flex-direction: column;
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
 }
 .number-sheet-footer.hidden { display: none }
 
-.number-sheet-selected-info { display:flex; align-items:center; gap:8px }
+.number-sheet-selected-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
 .number-sheet-selected-num {
   font-family: var(--font-numbers);
-  font-size: 1.5rem;
+  font-size: 1.6rem;
   color: var(--gold);
   filter: drop-shadow(0 0 6px rgba(255,215,0,0.3));
 }
-.number-sheet-selected-label { font-size:0.82rem; color:rgba(255,255,255,0.5) }
+.number-sheet-selected-label { font-size: 0.85rem; color: rgba(255,255,255,0.5) }
 
 .number-sheet-confirm-btn {
-  margin-left: auto;
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 12px 20px;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 24px;
   border-radius: 50px;
   background: #25D366;
   color: white;
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 1rem;
   font-weight: 700;
   text-decoration: none;
   transition: var(--transition);
   box-shadow: 0 4px 15px rgba(37,211,102,0.3);
-  white-space: nowrap;
 }
-.number-sheet-confirm-btn:active { transform:scale(0.96) }
+.number-sheet-confirm-btn:active { transform: scale(0.97) }
 
 /* 5 cols on wider phones */
 @media (min-width: 420px) {

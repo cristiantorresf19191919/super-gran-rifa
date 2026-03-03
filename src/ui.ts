@@ -390,9 +390,16 @@ export function openNumberSheetWithSelection(num: number): void {
 }
 
 export function updateSheetData(taken: Set<number>, total: number): void {
+  const totalChanged = total !== sheetTotalTickets;
   sheetTakenNumbers = taken;
   sheetTotalTickets = total;
-  renderSheetGrid();
+
+  if (totalChanged || !document.querySelector('.sheet-cell')) {
+    renderSheetGrid();
+  } else {
+    // In-place update: just toggle classes, preserves scroll position
+    updateSheetCellStates();
+  }
 }
 
 function renderSheetGrid(): void {
@@ -414,15 +421,37 @@ function renderSheetGrid(): void {
     cell.dataset.num = i.toString();
     cell.type = 'button';
 
-    if (!isTaken) {
-      cell.addEventListener('click', () => {
-        sheetSelectedNumber = i;
-        updateSheetCellHighlights();
-        updateSheetFooter();
-      });
-    }
+    // Always attach listener; check taken state at click time
+    cell.addEventListener('click', () => {
+      if (sheetTakenNumbers.has(i)) return;
+      sheetSelectedNumber = i;
+      updateSheetCellHighlights();
+      updateSheetFooter();
+    });
 
     grid.appendChild(cell);
+  }
+}
+
+function updateSheetCellStates(): void {
+  const grid = document.getElementById('numberSheetGrid');
+  if (!grid) return;
+
+  for (let i = 0; i < grid.children.length; i++) {
+    const cell = grid.children[i] as HTMLElement;
+    const num = parseInt(cell.dataset.num || '-1', 10);
+    const isTaken = sheetTakenNumbers.has(num);
+    const isSelected = num === sheetSelectedNumber && !isTaken;
+
+    cell.className = 'sheet-cell'
+      + (isTaken ? ' sheet-cell-taken' : ' sheet-cell-available')
+      + (isSelected ? ' sheet-cell-selected' : '');
+  }
+
+  // If selected number got taken by someone else, clear selection
+  if (sheetSelectedNumber !== null && sheetTakenNumbers.has(sheetSelectedNumber)) {
+    sheetSelectedNumber = null;
+    updateSheetFooter();
   }
 }
 
