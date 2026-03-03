@@ -620,6 +620,30 @@ body {
   grid-template-columns: repeat(4, 1fr);
   gap: 10px;
   align-content: start;
+  position: relative;
+}
+
+/* ─── Skeleton Loading ─── */
+.sheet-skeleton-wrap {
+  display: contents;
+}
+.sheet-skeleton {
+  min-height: 56px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(
+    110deg,
+    rgba(255,255,255,0.04) 30%,
+    rgba(255,255,255,0.08) 50%,
+    rgba(255,255,255,0.04) 70%
+  );
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.4s ease-in-out infinite;
+  border: 2px solid rgba(255,255,255,0.05);
+}
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
 }
 
 .sheet-cell {

@@ -399,6 +399,9 @@ function openNumberSheet(): void {
     const magicBtn = document.getElementById('magicLuckyBtn');
     if (magicBtn) magicBtn.style.display = '';
   }
+
+  // Show skeleton if grid hasn't been populated yet
+  showSheetSkeleton();
 }
 
 function closeNumberSheet(): void {
@@ -471,6 +474,25 @@ export function updateSheetData(taken: Set<number>, total: number): void {
   }
 }
 
+function showSheetSkeleton(): void {
+  const grid = document.getElementById('numberSheetGrid');
+  if (!grid) return;
+  // Only show skeleton if grid is genuinely empty (no real cells)
+  if (grid.querySelector('.sheet-cell')) return;
+
+  grid.innerHTML = '';
+  const wrap = document.createElement('div');
+  wrap.className = 'sheet-skeleton-wrap';
+  // Show 20 skeleton placeholders (5 rows)
+  for (let i = 0; i < 20; i++) {
+    const skel = document.createElement('div');
+    skel.className = 'sheet-skeleton';
+    skel.style.animationDelay = `${i * 60}ms`;
+    wrap.appendChild(skel);
+  }
+  grid.appendChild(wrap);
+}
+
 function renderSheetGrid(): void {
   const grid = document.getElementById('numberSheetGrid');
   if (!grid) return;
@@ -489,8 +511,8 @@ function renderSheetGrid(): void {
     cell.textContent = label;
     cell.dataset.num = i.toString();
     cell.type = 'button';
-    // Staggered reveal animation (capped at 40ms * index, max 800ms)
-    cell.style.animationDelay = `${Math.min(i * 12, 600)}ms`;
+    // Subtle staggered reveal (fast: 5ms per cell, max 200ms)
+    cell.style.animationDelay = `${Math.min(i * 5, 200)}ms`;
 
     // Prevent focus-induced scroll on desktop (mousedown default = focus)
     cell.addEventListener('mousedown', (e) => e.preventDefault());
