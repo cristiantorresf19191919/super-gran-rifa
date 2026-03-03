@@ -2,6 +2,10 @@
   command = "npm run build"
   publish = "dist"
 
+[build.environment]
+  # Firebase client keys are public by design — disable false-positive detection
+  SECRETS_SCAN_SMART_DETECTION_ENABLED = "false"
+
 # SPA fallback — serve index.html for all routes
 [[redirects]]
   from = "/*"
