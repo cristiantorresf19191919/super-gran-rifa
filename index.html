@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Super Gran Rifa - Premio Gordo $800.000</title>
+  <meta name="description" content="Super Gran Rifa - Invierte $20.000 y gana $800.000 en efectivo. Solo 100 boletas disponibles. Se juega el 2 de junio 2026 con la Lotería de la Cruz Roja." />
+
+  <!-- Open Graph (Facebook, WhatsApp, Telegram, iMessage, etc.) -->
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="Super Gran Rifa — Premio Gordo $800.000" />
+  <meta property="og:description" content="Invierte $20.000 y gana $800.000 en efectivo. Solo 100 boletas. Se juega el 2 de junio 2026 — Lotería de la Cruz Roja." />
+  <meta property="og:image" content="/og-image.jpg" />
+  <meta property="og:image:width" content="992" />
+  <meta property="og:image:height" content="1200" />
+  <meta property="og:image:alt" content="Tablero de la Super Gran Rifa mostrando 100 números disponibles. Premio gordo $800.000 en efectivo." />
+  <meta property="og:locale" content="es_CO" />
+  <meta property="og:site_name" content="Super Gran Rifa" />
+
+  <!-- Twitter Card (also used by some other apps) -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="Super Gran Rifa — Premio Gordo $800.000" />
+  <meta name="twitter:description" content="Invierte $20.000 y gana $800.000 en efectivo. Solo 100 boletas disponibles." />
+  <meta name="twitter:image" content="/og-image.jpg" />
+  <meta name="twitter:image:alt" content="Tablero de la Super Gran Rifa mostrando 100 números disponibles" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Montserrat:wght@400;500;600;700;800&family=Righteous&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/src/styles/main.css" />
+</head>
+<body>
+  <!-- Floating sparkles background -->
+  <div class="sparkles-bg">
+    <div class="sparkle s1"></div>
+    <div class="sparkle s2"></div>
+    <div class="sparkle s3"></div>
+    <div class="sparkle s4"></div>
+    <div class="sparkle s5"></div>
+    <div class="sparkle s6"></div>
+    <div class="sparkle s7"></div>
+    <div class="sparkle s8"></div>
+  </div>
+
+  <div class="app-container">
+    <!-- ═══ COMPACT HEADER ═══ -->
+    <header class="header">
+      <div class="header-content">
+        <h1 class="brand">
+          <span class="brand-prefix">Super Gran</span>
+          <span class="brand-name">RIFA</span>
+        </h1>
+        <div class="auth-section">
+          <button id="loginBtn" class="btn-login" title="Administrador">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <span id="loginBtnText">Admin</span>
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ═══ HERO: Prize + Scarcity ═══ -->
+    <section class="hero">
+      <div class="hero-prize">
+        <span class="hero-label">PREMIO GORDO</span>
+        <span class="hero-amount" id="prizeAmount">$800.000</span>
+        <span class="hero-sublabel">EN EFECTIVO</span>
+        <div class="hero-glow"></div>
+      </div>
+      <div class="hero-right">
+        <div class="hero-invest">
+          Invierte <strong id="ticketPrice">$20.000</strong><br>
+          y gana <strong class="gold" id="investPrize">$800.000</strong>
+        </div>
+        <div class="hero-scarcity">
+          <div class="scarcity-bar">
+            <div class="scarcity-fill" id="scarcityFill" style="width: 0%"></div>
+          </div>
+          <div class="scarcity-text">
+            <span class="scarcity-emoji">🔥</span>
+            <span><strong id="availableCount">100</strong> <span id="scarcityTotal">disponibles de 100</span></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ TRUST BADGE ═══ -->
+    <div class="trust-strip">
+      <span class="trust-shield">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          <path d="M9 12l2 2 4-4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </span>
+      Se juega el <strong id="drawDate">2 de junio 2026</strong> &middot;
+      <span class="cross">✚</span> Lotería de la Cruz Roja <span class="cross">✚</span>
+    </div>
+
+    <!-- ═══ ADMIN BAR ═══ -->
+    <div id="adminBar" class="admin-bar hidden">
+      <div class="admin-bar-content">
+        <span class="admin-indicator"></span>
+        <span>Modo Admin — Clic en un número para marcarlo</span>
+        <button id="dashboardBtn" class="btn-dashboard">Dashboard</button>
+        <button id="logoutBtn" class="btn-logout">Salir</button>
+      </div>
+    </div>
+
+    <!-- ═══ GAME BOARD ═══ -->
+    <section class="board-section">
+      <div id="game-container" class="game-container"></div>
+      <div class="board-legend">
+        <div class="legend-item">
+          <span class="legend-dot available"></span>
+          <span>Disponible</span>
+        </div>
+        <div class="legend-item">
+          <span class="legend-dot taken"></span>
+          <span>Apartado</span>
+        </div>
+        <div class="legend-item legend-counter">
+          <span id="takenCount" class="taken-badge">0</span>
+          <span>vendidos</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ INFO CARDS ═══ -->
+    <section class="info-section">
+      <div class="info-grid">
+        <!-- Organizer -->
+        <div class="info-card">
+          <div class="info-icon">👤</div>
+          <div class="info-text">
+            Organiza: <strong>Sonia Guevara</strong>
+          </div>
+        </div>
+
+        <!-- Contact WhatsApp -->
+        <div class="info-card contact-card">
+          <div class="info-icon whatsapp-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="#25D366">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+          </div>
+          <div class="info-text">
+            <a href="#" id="whatsappLink" class="whatsapp-link"><strong>3103323904</strong></a>
+            <span class="whatsapp-only">(WhatsApp)</span>
+          </div>
+        </div>
+
+        <!-- Payments -->
+        <div class="info-card payment-card">
+          <div class="info-icon">💳</div>
+          <div class="info-text">
+            <button id="paymentBtn" class="payment-link">
+              <span class="payment-badge daviplata">DaviPlata</span>
+              <span class="payment-badge prepago">Pre</span>
+              <strong class="payment-number">3026323904</strong>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ CTA FOOTER ═══ -->
+    <section class="cta-section">
+      <p class="cta-main" id="ctaMain">Son solo 100 oportunidades.</p>
+      <p class="cta-question">¿La tuya ya está apartada?</p>
+    </section>
+  </div>
+
+  <!-- ═══ STICKY CTA BAR (shown when user clicks available number) ═══ -->
+  <div id="stickyCta" class="sticky-cta hidden">
+    <div class="sticky-cta-content">
+      <div class="sticky-cta-info">
+        <span class="sticky-number" id="stickyNumber">#00</span>
+        <span class="sticky-label">está disponible</span>
+      </div>
+      <a href="#" id="stickyWhatsapp" class="sticky-btn" target="_blank" rel="noopener">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Apartar por <span id="stickyPrice">$20.000</span>
+      </a>
+      <button id="stickyClose" class="sticky-close">&times;</button>
+    </div>
+  </div>
+
+  <!-- ═══ MODALS ═══ -->
+
+  <!-- Login Modal -->
+  <div id="loginModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content login-modal">
+      <button class="modal-close" id="loginModalClose">&times;</button>
+      <h2 class="modal-title">Acceso Administrador</h2>
+      <form id="loginForm" class="login-form">
+        <div class="form-group">
+          <label for="email">Correo electrónico</label>
+          <input type="email" id="email" value="admin@mail.com" placeholder="admin@mail.com" required />
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" placeholder="••••••••" required />
+        </div>
+        <p id="loginError" class="form-error hidden"></p>
+        <button type="submit" class="btn-submit">
+          <span id="loginSpinner" class="spinner hidden"></span>
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Payment Modal -->
+  <div id="paymentModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content payment-modal">
+      <button class="modal-close" id="paymentModalClose">&times;</button>
+      <h2 class="modal-title">Elige tu método de pago</h2>
+      <p class="payment-subtitle">Envía <strong id="paymentPrice">$20.000</strong> al número <strong>302-632-3904</strong></p>
+      <div class="payment-options">
+        <a href="https://play.google.com/store/apps/details?id=com.davivienda.daviplataapp" target="_blank" rel="noopener" class="payment-option daviplata-option" id="daviplataCard">
+          <div class="payment-option-icon">
+            <svg viewBox="0 0 100 100" width="44" height="44"><circle cx="50" cy="50" r="45" fill="#e21b1b"/><text x="50" y="58" text-anchor="middle" fill="white" font-size="20" font-weight="bold">Davi</text></svg>
+          </div>
+          <div class="payment-option-info">
+            <h3>DaviPlata</h3>
+            <p>Transferir a 302-632-3904</p>
+          </div>
+          <div class="payment-arrow">→</div>
+        </a>
+        <a href="https://www.movii.com.co/" target="_blank" rel="noopener" class="payment-option pre-option" id="preCard">
+          <div class="payment-option-icon">
+            <svg viewBox="0 0 100 100" width="44" height="44"><circle cx="50" cy="50" r="45" fill="#00b140"/><text x="50" y="58" text-anchor="middle" fill="white" font-size="22" font-weight="bold">Pre</text></svg>
+          </div>
+          <div class="payment-option-info">
+            <h3>Prepago / Recarga</h3>
+            <p>Recargar a 302-632-3904</p>
+          </div>
+          <div class="payment-arrow">→</div>
+        </a>
+      </div>
+      <p class="payment-footer">Después de pagar, envía tu comprobante por
+        <a href="#" id="paymentWhatsapp" class="whatsapp-inline">WhatsApp</a>
+      </p>
+    </div>
+  </div>
+
+  <!-- Confirm Modal (Admin) -->
+  <div id="confirmModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content confirm-modal">
+      <button class="modal-close" id="confirmModalClose">&times;</button>
+      <h2 class="modal-title">Confirmar Acción</h2>
+      <p id="confirmText" class="confirm-text"></p>
+      <div class="confirm-buttons">
+        <button id="confirmYes" class="btn-confirm btn-yes">Confirmar</button>
+        <button id="confirmNo" class="btn-confirm btn-no">Cancelar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Number Info Modal (Public) — kept as fallback -->
+  <div id="numberInfoModal" class="modal hidden">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content number-info-modal">
+      <button class="modal-close" id="numberInfoModalClose">&times;</button>
+      <div id="numberInfoContent"></div>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
