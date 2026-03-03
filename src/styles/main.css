@@ -383,6 +383,35 @@ body {
 .form-group input { padding:11px 14px;border:1px solid rgba(255,255,255,0.12);border-radius:var(--radius-xs);font-family:var(--font-body);font-size:0.95rem;transition:var(--transition);outline:none;background:rgba(255,255,255,0.05);color:#fff }
 .form-group input::placeholder { color:rgba(255,255,255,0.25) }
 .form-group input:focus { border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,215,0,0.08);background:rgba(255,255,255,0.07) }
+/* Password toggle */
+.password-input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.password-input-wrap input {
+  width: 100%;
+  padding-right: 44px;
+}
+.password-toggle {
+  position: absolute;
+  right: 6px;
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.35);
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease, background 0.2s ease;
+}
+.password-toggle:hover {
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.06);
+}
+
 .form-error { color:#ff6b6b;font-size:0.82rem;text-align:center;font-weight:500 }
 .btn-submit { padding:13px;background:linear-gradient(135deg,var(--gold-dark),var(--gold));color:#1a1a1a;border:none;border-radius:var(--radius-xs);font-family:var(--font-body);font-size:0.95rem;font-weight:700;cursor:pointer;transition:var(--transition);display:flex;align-items:center;justify-content:center;gap:8px }
 .btn-submit:hover { transform:translateY(-1px);box-shadow:0 4px 20px rgba(255,215,0,0.3) }
@@ -683,6 +712,217 @@ body {
   box-shadow: 0 4px 15px rgba(37,211,102,0.3);
 }
 .number-sheet-confirm-btn:active { transform: scale(0.97) }
+
+/* ─── Magic Lucky Button ─── */
+.magic-lucky-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: calc(100% - 32px);
+  margin: 0 16px 10px;
+  padding: 12px 20px;
+  border: 2px solid rgba(255,215,0,0.35);
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.18));
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  animation: magicPulse 2s ease-in-out infinite;
+}
+.magic-lucky-btn svg { stroke: var(--gold); flex-shrink: 0 }
+.magic-lucky-btn:active { transform: scale(0.96) }
+.magic-lucky-btn:disabled {
+  opacity: 0.45;
+  pointer-events: none;
+  animation: none;
+}
+
+@keyframes magicPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.2); }
+  50% { box-shadow: 0 0 0 8px rgba(255,215,0,0); }
+}
+
+/* ─── Slot-machine cycling highlight ─── */
+.sheet-cell-cycling {
+  background: linear-gradient(135deg, #b8860b, #ffd700) !important;
+  border-color: var(--gold) !important;
+  color: #1a1a1a !important;
+  box-shadow: 0 0 18px rgba(255,215,0,0.5);
+  transform: scale(1.08);
+}
+
+/* ─── Burst ring on winner cell ─── */
+.sheet-cell-burst {
+  position: relative;
+}
+.sheet-cell-burst::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: inherit;
+  border: 3px solid #22c55e;
+  animation: burstRing 0.6s ease-out forwards;
+  pointer-events: none;
+}
+@keyframes burstRing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+/* ─── Confetti container ─── */
+.sheet-confetti-container {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 10;
+}
+
+/* ─── Confetti pieces ─── */
+.confetti-piece {
+  position: absolute;
+  width: var(--cw, 8px);
+  height: var(--ch, 12px);
+  background: var(--cc, #ffd700);
+  border-radius: var(--cr, 2px);
+  left: var(--cx, 50%);
+  bottom: var(--cy, 0);
+  opacity: 0;
+  animation: confettiFall var(--cd, 1.8s) var(--cdelay, 0s) ease-out forwards;
+}
+
+@keyframes confettiFall {
+  0% {
+    opacity: 1;
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+  }
+  20% {
+    opacity: 1;
+    transform: translateY(calc(var(--cdy, -300px) * 0.5)) translateX(calc(var(--cdx, 0px) * 0.4)) rotate(180deg) scale(1.1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(var(--cdy, -300px)) translateX(var(--cdx, 0px)) rotate(var(--crot, 720deg)) scale(0.4);
+  }
+}
+
+/* ─── Admin Sheet Actions ─── */
+.number-sheet-admin-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+}
+.sheet-admin-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 15px 24px;
+  border-radius: 50px;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.sheet-admin-btn:active { transform: scale(0.96) }
+
+.sheet-admin-mark {
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  color: #1a1a1a;
+  box-shadow: 0 4px 15px rgba(255,215,0,0.25);
+}
+.sheet-admin-mark:hover {
+  box-shadow: 0 6px 20px rgba(255,215,0,0.35);
+  transform: translateY(-1px);
+}
+
+.sheet-admin-release {
+  background: rgba(231,76,60,0.15);
+  border: 1.5px solid rgba(231,76,60,0.3);
+  color: #e74c3c;
+}
+.sheet-admin-release:hover {
+  background: rgba(231,76,60,0.25);
+  border-color: rgba(231,76,60,0.5);
+  transform: translateY(-1px);
+}
+
+/* ─── Professional Animations ─── */
+
+/* Spring easing for bottom sheet panel */
+.number-sheet-panel {
+  animation: sheetSpringUp 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes sheetSpringUp {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+
+/* Backdrop fade with blur */
+.number-sheet-backdrop {
+  animation: backdropFadeIn 0.3s ease-out;
+}
+@keyframes backdropFadeIn {
+  from { opacity: 0; backdrop-filter: blur(0); }
+  to { opacity: 1; backdrop-filter: blur(8px); }
+}
+
+/* Staggered grid cell reveal */
+.sheet-cell {
+  animation: cellReveal 0.3s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
+}
+@keyframes cellReveal {
+  from {
+    opacity: 0;
+    transform: scale(0.85);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Footer slide-up with spring */
+.number-sheet-footer.active {
+  animation: footerSpringUp 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes footerSpringUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Smooth cell selection transition */
+.sheet-cell-selected {
+  transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+}
+
+/* Subtle press feedback for cells */
+.sheet-cell-available:active {
+  transition: transform 0.08s ease;
+}
+
+/* Modal content spring animation */
+.modal-content {
+  animation: modalSpringUp 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+@keyframes modalSpringUp {
+  0% { transform: translateY(40px) scale(0.95); opacity: 0; }
+  100% { transform: translateY(0) scale(1); opacity: 1; }
+}
 
 /* 5 cols on wider phones */
 @media (min-width: 420px) {

@@ -90,6 +90,20 @@ export function setupLoginModal(
   const errorEl = document.getElementById('loginError');
   const spinner = document.getElementById('loginSpinner');
 
+  // Password visibility toggle
+  const pwToggle = document.getElementById('passwordToggle');
+  const pwInput = document.getElementById('password') as HTMLInputElement;
+  const eyeOpen = document.getElementById('eyeOpen');
+  const eyeClosed = document.getElementById('eyeClosed');
+  pwToggle?.addEventListener('click', () => {
+    if (pwInput) {
+      const showing = pwInput.type === 'text';
+      pwInput.type = showing ? 'password' : 'text';
+      if (eyeOpen) eyeOpen.style.display = showing ? '' : 'none';
+      if (eyeClosed) eyeClosed.style.display = showing ? 'none' : '';
+    }
+  });
+
   form?.addEventListener('submit', async (e) => {
     e.preventDefault();
     const email = (document.getElementById('email') as HTMLInputElement).value;
@@ -334,6 +348,10 @@ export function hideStickyCta(): void {
 let sheetSelectedNumber: number | null = null;
 let sheetTakenNumbers: Set<number> = new Set();
 let sheetTotalTickets = 100;
+let magicAnimationRunning = false;
+let sheetAdminMode = false;
+let sheetAdminOnToggle: ((num: number) => Promise<void>) | null = null;
+let sheetAdminOnBuyerForm: ((num: number) => void) | null = null;
 
 export function setupNumberSheet(): void {
   const btn = document.getElementById('chooseNumberBtn');
@@ -350,6 +368,10 @@ export function setupNumberSheet(): void {
     filterSheetNumbers(searchInput.value);
   });
 
+  // Magic lucky button
+  const magicBtn = document.getElementById('magicLuckyBtn');
+  magicBtn?.addEventListener('click', () => runMagicLuckyAnimation());
+
   // Close on Escape
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape' && !sheet?.classList.contains('hidden')) {
@@ -363,18 +385,31 @@ function openNumberSheet(): void {
   sheet?.classList.remove('hidden');
   document.body.style.overflow = 'hidden';
 
-  // Reset
+  // Reset (don't reset admin mode — it's set before calling openNumberSheet)
   sheetSelectedNumber = null;
   updateSheetFooter();
   const search = document.getElementById('numberSearch') as HTMLInputElement;
   if (search) search.value = '';
   filterSheetNumbers('');
+
+  // Restore title for non-admin
+  if (!sheetAdminMode) {
+    const title = document.querySelector('.number-sheet-title');
+    if (title) title.textContent = 'Elige tu número';
+    const magicBtn = document.getElementById('magicLuckyBtn');
+    if (magicBtn) magicBtn.style.display = '';
+  }
 }
 
 function closeNumberSheet(): void {
   const sheet = document.getElementById('numberSheet');
   sheet?.classList.add('hidden');
   document.body.style.overflow = '';
+
+  // Clean up admin mode
+  sheetAdminMode = false;
+  sheetAdminOnToggle = null;
+  sheetAdminOnBuyerForm = null;
 }
 
 export function openNumberSheetWithSelection(num: number): void {
@@ -383,6 +418,40 @@ export function openNumberSheetWithSelection(num: number): void {
   updateSheetCellHighlights();
   updateSheetFooter();
   // Scroll selected cell into view
+  requestAnimationFrame(() => {
+    const cell = document.querySelector(`.sheet-cell[data-num="${num}"]`) as HTMLElement;
+    cell?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+}
+
+/* ─── Admin Sheet Mode ─── */
+export function openAdminSheet(
+  onToggle: (num: number) => Promise<void>,
+  onBuyerForm: (num: number) => void,
+): void {
+  sheetAdminMode = true;
+  sheetAdminOnToggle = onToggle;
+  sheetAdminOnBuyerForm = onBuyerForm;
+  openNumberSheet();
+
+  // Update title for admin
+  const title = document.querySelector('.number-sheet-title');
+  if (title) title.textContent = 'Seleccionar número (Admin)';
+
+  // Hide magic button in admin mode
+  const magicBtn = document.getElementById('magicLuckyBtn');
+  if (magicBtn) magicBtn.style.display = 'none';
+}
+
+export function openAdminSheetWithSelection(
+  num: number,
+  onToggle: (num: number) => Promise<void>,
+  onBuyerForm: (num: number) => void,
+): void {
+  openAdminSheet(onToggle, onBuyerForm);
+  sheetSelectedNumber = num;
+  updateSheetCellHighlights();
+  updateSheetFooter();
   requestAnimationFrame(() => {
     const cell = document.querySelector(`.sheet-cell[data-num="${num}"]`) as HTMLElement;
     cell?.scrollIntoView({ block: 'center', behavior: 'smooth' });
@@ -420,6 +489,8 @@ function renderSheetGrid(): void {
     cell.textContent = label;
     cell.dataset.num = i.toString();
     cell.type = 'button';
+    // Staggered reveal animation (capped at 40ms * index, max 800ms)
+    cell.style.animationDelay = `${Math.min(i * 12, 600)}ms`;
 
     // Prevent focus-induced scroll on desktop (mousedown default = focus)
     cell.addEventListener('mousedown', (e) => e.preventDefault());
@@ -429,7 +500,8 @@ function renderSheetGrid(): void {
       const g = document.getElementById('numberSheetGrid');
       const scrollPos = g?.scrollTop ?? 0;
 
-      if (sheetTakenNumbers.has(i)) return;
+      // In public mode, ignore taken numbers; in admin mode, allow selection
+      if (sheetTakenNumbers.has(i) && !sheetAdminMode) return;
       sheetSelectedNumber = i;
       updateSheetCellHighlights();
       updateSheetFooter();
@@ -478,25 +550,216 @@ function updateSheetCellHighlights(): void {
 function updateSheetFooter(): void {
   const footer = document.getElementById('numberSheetFooter');
   const numEl = document.getElementById('numberSheetSelectedNum');
-  const confirmLink = document.getElementById('numberSheetConfirm');
+  const labelEl = document.querySelector('.number-sheet-selected-label');
+  const confirmLink = document.getElementById('numberSheetConfirm') as HTMLElement;
+  const adminActions = document.getElementById('numberSheetAdminActions') as HTMLElement;
+  const adminMark = document.getElementById('sheetAdminMark');
+  const adminRelease = document.getElementById('sheetAdminRelease');
 
-  if (sheetSelectedNumber !== null && !sheetTakenNumbers.has(sheetSelectedNumber)) {
-    footer?.classList.add('active');
-    const label = sheetSelectedNumber.toString().padStart(2, '0');
-    if (numEl) numEl.textContent = `#${label}`;
-
-    const msg = encodeURIComponent(
-      `Hola quiero ganarme el premio y quiero jugar con el número ${label}`,
-    );
-    confirmLink?.setAttribute('href', `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`);
-
-    // Close sheet when user taps confirm (they're going to WhatsApp)
-    confirmLink?.addEventListener('click', () => {
-      setTimeout(() => closeNumberSheet(), 300);
-    }, { once: true });
-  } else {
+  if (sheetSelectedNumber === null) {
     footer?.classList.remove('active');
+    return;
   }
+
+  const isTaken = sheetTakenNumbers.has(sheetSelectedNumber);
+  const label = sheetSelectedNumber.toString().padStart(2, '0');
+  if (numEl) numEl.textContent = `#${label}`;
+
+  if (sheetAdminMode) {
+    // Admin mode: show admin buttons, hide WhatsApp CTA
+    footer?.classList.add('active');
+    if (confirmLink) confirmLink.style.display = 'none';
+    if (adminActions) adminActions.style.display = '';
+
+    if (labelEl) labelEl.textContent = isTaken ? 'apartado' : 'disponible';
+
+    // Show appropriate button
+    if (adminMark) adminMark.style.display = isTaken ? 'none' : '';
+    if (adminRelease) adminRelease.style.display = isTaken ? '' : 'none';
+
+    // Wire admin action handlers (clone to remove old listeners)
+    const selectedNum = sheetSelectedNumber;
+
+    if (adminMark && !isTaken) {
+      const newMark = adminMark.cloneNode(true) as HTMLElement;
+      adminMark.parentNode?.replaceChild(newMark, adminMark);
+      newMark.addEventListener('click', async () => {
+        if (sheetAdminOnToggle) {
+          await sheetAdminOnToggle(selectedNum);
+          if (sheetAdminOnBuyerForm) sheetAdminOnBuyerForm(selectedNum);
+        }
+        closeNumberSheet();
+      });
+    }
+
+    if (adminRelease && isTaken) {
+      const newRelease = adminRelease.cloneNode(true) as HTMLElement;
+      adminRelease.parentNode?.replaceChild(newRelease, adminRelease);
+      newRelease.addEventListener('click', async () => {
+        if (sheetAdminOnToggle) {
+          await sheetAdminOnToggle(selectedNum);
+        }
+        closeNumberSheet();
+      });
+    }
+  } else {
+    // Public mode: show WhatsApp CTA, hide admin buttons
+    if (adminActions) adminActions.style.display = 'none';
+    if (confirmLink) confirmLink.style.display = '';
+    if (labelEl) labelEl.textContent = 'disponible';
+
+    if (!isTaken) {
+      footer?.classList.add('active');
+
+      const msg = encodeURIComponent(
+        `Hola quiero ganarme el premio y quiero jugar con el número ${label}`,
+      );
+      const waUrl = `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`;
+      confirmLink?.setAttribute('href', waUrl);
+
+      // Confetti + delayed WhatsApp open
+      confirmLink?.addEventListener('click', (e) => {
+        e.preventDefault();
+        fireSheetConfetti();
+        setTimeout(() => {
+          window.open(waUrl, '_blank', 'noopener');
+          closeNumberSheet();
+        }, 1500);
+      }, { once: true });
+    } else {
+      footer?.classList.remove('active');
+    }
+  }
+}
+
+/* ─── Magic Lucky Animation ─── */
+function runMagicLuckyAnimation(): void {
+  if (magicAnimationRunning) return;
+
+  // Collect available numbers
+  const available: number[] = [];
+  for (let i = 0; i < sheetTotalTickets; i++) {
+    if (!sheetTakenNumbers.has(i)) available.push(i);
+  }
+  if (available.length === 0) return;
+
+  magicAnimationRunning = true;
+  const magicBtn = document.getElementById('magicLuckyBtn') as HTMLButtonElement;
+  if (magicBtn) magicBtn.disabled = true;
+
+  // Pick the winner up front
+  const winnerNum = available[Math.floor(Math.random() * available.length)];
+
+  // Build 40-step sequence: 30 fast + 10 decelerating
+  const totalSteps = 40;
+  const fastSteps = 30;
+  let prevCell: HTMLElement | null = null;
+
+  let step = 0;
+  function tick(): void {
+    // Clear previous highlight
+    if (prevCell) prevCell.classList.remove('sheet-cell-cycling');
+
+    if (step >= totalSteps) {
+      finishMagicAnimation(winnerNum);
+      return;
+    }
+
+    // Pick which number to highlight this step
+    let num: number;
+    if (step < totalSteps - 1) {
+      // Random available number
+      num = available[Math.floor(Math.random() * available.length)];
+    } else {
+      // Final step: land on winner
+      num = winnerNum;
+    }
+
+    const cell = document.querySelector(`.sheet-cell[data-num="${num}"]`) as HTMLElement;
+    if (cell) {
+      cell.classList.add('sheet-cell-cycling');
+      // Auto-scroll grid to follow the cycling cell
+      cell.scrollIntoView({ block: 'nearest', behavior: 'auto' });
+      prevCell = cell;
+    }
+
+    // Calculate delay: fast for first 30, decelerating for last 10
+    let delay: number;
+    if (step < fastSteps) {
+      delay = 60;
+    } else {
+      const decelStep = step - fastSteps;
+      const t = decelStep / (totalSteps - fastSteps - 1); // 0..1
+      delay = 80 + (250 - 80) * t * t; // quadratic easing
+    }
+
+    step++;
+    setTimeout(tick, delay);
+  }
+
+  tick();
+}
+
+function finishMagicAnimation(winnerNum: number): void {
+  sheetSelectedNumber = winnerNum;
+  updateSheetCellHighlights();
+  updateSheetFooter();
+
+  // Add burst effect on the winning cell
+  const winnerCell = document.querySelector(`.sheet-cell[data-num="${winnerNum}"]`) as HTMLElement;
+  if (winnerCell) {
+    winnerCell.classList.add('sheet-cell-burst');
+    // Smooth-scroll winner into center view
+    winnerCell.scrollIntoView({ block: 'center', behavior: 'smooth' });
+    // Clean up burst class after animation
+    setTimeout(() => winnerCell.classList.remove('sheet-cell-burst'), 700);
+  }
+
+  // Check if winner got taken during animation (Firebase race condition)
+  if (sheetTakenNumbers.has(winnerNum)) {
+    sheetSelectedNumber = null;
+    updateSheetCellHighlights();
+    updateSheetFooter();
+  }
+
+  // Re-enable button
+  magicAnimationRunning = false;
+  const magicBtn = document.getElementById('magicLuckyBtn') as HTMLButtonElement;
+  if (magicBtn) magicBtn.disabled = false;
+}
+
+/* ─── Sheet Confetti ─── */
+function fireSheetConfetti(): void {
+  const container = document.getElementById('sheetConfettiContainer');
+  if (!container) return;
+
+  const colors = ['#ffd700', '#22c55e', '#3b82f6', '#ef4444', '#a855f7', '#f97316', '#ec4899'];
+  const pieceCount = 40;
+
+  for (let i = 0; i < pieceCount; i++) {
+    const piece = document.createElement('div');
+    piece.className = 'confetti-piece';
+
+    const isCircle = Math.random() > 0.5;
+    const size = 6 + Math.random() * 8;
+
+    piece.style.setProperty('--cw', `${isCircle ? size : size * 0.6}px`);
+    piece.style.setProperty('--ch', `${size}px`);
+    piece.style.setProperty('--cr', isCircle ? '50%' : '2px');
+    piece.style.setProperty('--cc', colors[Math.floor(Math.random() * colors.length)]);
+    piece.style.setProperty('--cx', `${20 + Math.random() * 60}%`);
+    piece.style.setProperty('--cy', '40px');
+    piece.style.setProperty('--cdx', `${(Math.random() - 0.5) * 200}px`);
+    piece.style.setProperty('--cdy', `${-200 - Math.random() * 300}px`);
+    piece.style.setProperty('--crot', `${360 + Math.random() * 720}deg`);
+    piece.style.setProperty('--cd', `${1.2 + Math.random() * 1}s`);
+    piece.style.setProperty('--cdelay', `${Math.random() * 0.3}s`);
+
+    container.appendChild(piece);
+  }
+
+  // Self-clean after 2.2s
+  setTimeout(() => { container.innerHTML = ''; }, 2200);
 }
 
 function filterSheetNumbers(query: string): void {

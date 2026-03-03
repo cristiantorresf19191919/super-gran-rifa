@@ -30,6 +30,7 @@ import {
   setupNumberSheet,
   updateSheetData,
   openNumberSheetWithSelection,
+  openAdminSheetWithSelection,
 } from './ui';
 
 /* ─── State ─── */
@@ -92,46 +93,24 @@ function handleAdminClick(num: number): void {
   // Ignore clicks while a toggle operation is in progress
   if (isToggling) return;
 
-  const label = num.toString().padStart(2, '0');
-  const isTaken = currentTaken.has(num);
-
-  if (isTaken) {
-    // Releasing: warn that buyer info will be deleted
-    showConfirmModal(
-      `¿Deseas liberar el número ${label}? Se eliminará la info del comprador.`,
-      async () => {
-        if (isToggling) return;
-        isToggling = true;
-        try {
-          await toggleNumber(num);
-        } catch (err) {
-          console.error('Error toggling number:', err);
-        } finally {
-          isToggling = false;
-        }
-      },
-    );
-  } else {
-    // Marking as taken: confirm, then show buyer form
-    showConfirmModal(
-      `¿Deseas marcar como apartado el número ${label}?`,
-      async () => {
-        if (isToggling) return;
-        isToggling = true;
-        try {
-          const wasTaken = await toggleNumber(num);
-          if (wasTaken) {
-            // Show buyer registration form immediately after marking
-            showBuyerForm(num);
-          }
-        } catch (err) {
-          console.error('Error toggling number:', err);
-        } finally {
-          isToggling = false;
-        }
-      },
-    );
-  }
+  // Open bottom sheet with admin controls for the selected number
+  openAdminSheetWithSelection(
+    num,
+    async (selectedNum: number) => {
+      if (isToggling) return;
+      isToggling = true;
+      try {
+        await toggleNumber(selectedNum);
+      } catch (err) {
+        console.error('Error toggling number:', err);
+      } finally {
+        isToggling = false;
+      }
+    },
+    (selectedNum: number) => {
+      showBuyerForm(selectedNum);
+    },
+  );
 }
 
 function handlePublicClick(num: number): void {
