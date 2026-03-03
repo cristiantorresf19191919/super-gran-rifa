@@ -631,7 +631,7 @@ body {
   transform: scale(1.05);
 }
 
-/* Footer confirm bar — stacked vertically for no clipping */
+/* Footer confirm bar — always in layout to prevent scroll jumps */
 .number-sheet-footer {
   padding: 16px 20px;
   padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
@@ -642,8 +642,14 @@ body {
   align-items: center;
   gap: 12px;
   flex-shrink: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
 }
-.number-sheet-footer.hidden { display: none }
+.number-sheet-footer.active {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 .number-sheet-selected-info {
   display: flex;

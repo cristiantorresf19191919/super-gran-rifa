@@ -469,7 +469,7 @@ function updateSheetFooter(): void {
   const confirmLink = document.getElementById('numberSheetConfirm');
 
   if (sheetSelectedNumber !== null && !sheetTakenNumbers.has(sheetSelectedNumber)) {
-    footer?.classList.remove('hidden');
+    footer?.classList.add('active');
     const label = sheetSelectedNumber.toString().padStart(2, '0');
     if (numEl) numEl.textContent = `#${label}`;
 
@@ -483,7 +483,7 @@ function updateSheetFooter(): void {
       setTimeout(() => closeNumberSheet(), 300);
     }, { once: true });
   } else {
-    footer?.classList.add('hidden');
+    footer?.classList.remove('active');
   }
 }
 
