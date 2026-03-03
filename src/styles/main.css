@@ -449,6 +449,234 @@ body {
   .game-container { border-radius: 12px }
 }
 
+/* ============================================
+   MOBILE NUMBER SELECTOR (Bottom Sheet)
+   ============================================ */
+
+/* Trigger button — prominent on mobile, hidden on desktop */
+.mobile-selector-wrap {
+  display: none;
+  margin: 12px 0 16px;
+}
+
+@media (max-width: 768px) {
+  .mobile-selector-wrap { display: block; }
+}
+
+.choose-number-btn {
+  width: 100%;
+  padding: 16px 24px;
+  border: 2px solid rgba(255,215,0,0.3);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(255,215,0,0.08), rgba(255,215,0,0.15));
+  color: var(--gold);
+  font-family: var(--font-body);
+  font-size: 1.1rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  animation: selectorPulse 2.5s ease-in-out infinite;
+}
+.choose-number-btn:active {
+  transform: scale(0.97);
+}
+
+@keyframes selectorPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(255,215,0,0.15); }
+  50% { box-shadow: 0 0 0 10px rgba(255,215,0,0); }
+}
+
+.choose-number-btn svg { stroke: var(--gold); flex-shrink: 0 }
+
+/* ─── Bottom Sheet ─── */
+.number-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 1050;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+.number-sheet.hidden { display: none }
+
+.number-sheet-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.2s ease;
+}
+@keyframes nsSheetFadeIn { from { opacity:0 } to { opacity:1 } }
+
+.number-sheet-panel {
+  position: relative;
+  max-height: 85vh;
+  background: linear-gradient(180deg, #1a2d45, #0f1e32);
+  border-top: 1px solid rgba(255,215,0,0.15);
+  border-radius: 20px 20px 0 0;
+  display: flex;
+  flex-direction: column;
+  animation: sheetSlideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 -8px 40px rgba(0,0,0,0.5);
+}
+@keyframes sheetSlideUp { from { transform:translateY(100%) } to { transform:translateY(0) } }
+
+.number-sheet-handle-wrap {
+  display: flex;
+  justify-content: center;
+  padding: 12px 0 4px;
+}
+.number-sheet-handle {
+  width: 40px;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(255,255,255,0.2);
+}
+
+.number-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 20px 8px;
+}
+.number-sheet-title {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--gold);
+}
+.number-sheet-close {
+  background: none;
+  border: none;
+  font-size: 1.8rem;
+  color: rgba(255,255,255,0.3);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: var(--transition);
+}
+.number-sheet-close:hover { color:#fff; background:rgba(255,255,255,0.1) }
+
+.number-sheet-search-wrap { padding: 0 16px 10px }
+.number-sheet-search {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  background: rgba(255,255,255,0.05);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: var(--transition);
+}
+.number-sheet-search::placeholder { color:rgba(255,255,255,0.25) }
+.number-sheet-search:focus { border-color:var(--gold); box-shadow:0 0 0 3px rgba(255,215,0,0.08) }
+
+/* Grid */
+.number-sheet-grid {
+  flex: 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 0 16px 16px;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  align-content: start;
+}
+
+.sheet-cell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 56px;
+  border-radius: var(--radius-sm);
+  font-family: var(--font-numbers);
+  font-size: 1.2rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border: 2px solid transparent;
+  -webkit-tap-highlight-color: transparent;
+  user-select: none;
+}
+
+.sheet-cell-available {
+  background: linear-gradient(135deg, #162e4a, #1e5080);
+  color: #fff;
+  border-color: rgba(100,180,255,0.2);
+}
+.sheet-cell-available:active { transform: scale(0.93) }
+
+.sheet-cell-taken {
+  background: linear-gradient(135deg, #2a2010, #3a2a0a);
+  color: rgba(255,215,0,0.4);
+  border-color: rgba(255,215,0,0.1);
+  cursor: default;
+  opacity: 0.55;
+}
+
+.sheet-cell-selected {
+  background: linear-gradient(135deg, #0d6a3a, #16a34a) !important;
+  border-color: #22c55e !important;
+  color: #fff !important;
+  box-shadow: 0 0 20px rgba(34,197,94,0.3);
+  transform: scale(1.05);
+}
+
+/* Footer confirm bar */
+.number-sheet-footer {
+  padding: 14px 20px;
+  padding-bottom: calc(14px + env(safe-area-inset-bottom, 0px));
+  border-top: 1px solid rgba(255,255,255,0.08);
+  background: linear-gradient(180deg, rgba(15,30,50,0.98), rgba(10,20,35,0.99));
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.number-sheet-footer.hidden { display: none }
+
+.number-sheet-selected-info { display:flex; align-items:center; gap:8px }
+.number-sheet-selected-num {
+  font-family: var(--font-numbers);
+  font-size: 1.5rem;
+  color: var(--gold);
+  filter: drop-shadow(0 0 6px rgba(255,215,0,0.3));
+}
+.number-sheet-selected-label { font-size:0.82rem; color:rgba(255,255,255,0.5) }
+
+.number-sheet-confirm-btn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  border-radius: 50px;
+  background: #25D366;
+  color: white;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: 0 4px 15px rgba(37,211,102,0.3);
+  white-space: nowrap;
+}
+.number-sheet-confirm-btn:active { transform:scale(0.96) }
+
+/* 5 cols on wider phones */
+@media (min-width: 420px) {
+  .number-sheet-grid { grid-template-columns: repeat(5, 1fr) }
+}
+
 ::-webkit-scrollbar { width:6px }
 ::-webkit-scrollbar-track { background:transparent }
 ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.08);border-radius:3px }

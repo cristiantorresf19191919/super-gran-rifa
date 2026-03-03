@@ -27,6 +27,9 @@ import {
   updatePrizeDisplay,
   updateDrawDate,
   updateDynamicTexts,
+  setupNumberSheet,
+  updateSheetData,
+  openNumberSheetWithSelection,
 } from './ui';
 
 /* ─── State ─── */
@@ -134,11 +137,14 @@ function handleAdminClick(num: number): void {
 function handlePublicClick(num: number): void {
   const taken = currentTaken.has(num);
   if (taken) {
-    // Taken: show info modal
     showNumberInfo(num, true);
   } else {
-    // Available: show sticky CTA bar at bottom (faster conversion)
-    showStickyCta(num);
+    // On mobile, open bottom sheet with pre-selected number for confirmation
+    if (window.innerWidth <= 768) {
+      openNumberSheetWithSelection(num);
+    } else {
+      showStickyCta(num);
+    }
   }
 }
 
@@ -159,6 +165,9 @@ function setupDataListener(): void {
 
     // Update counter UI
     updateCounters(taken.size, currentTotalTickets);
+
+    // Update bottom sheet grid
+    updateSheetData(taken, currentTotalTickets);
 
     // Pipe data to admin dashboard
     updateDashboardData(data.buyers || {}, data.takenNumbers || {});
@@ -216,6 +225,7 @@ function init(): void {
   // Setup static UI
   setupWhatsAppLink();
   setupPaymentModal();
+  setupNumberSheet();
 
   // Setup admin dashboard (creates DOM elements)
   setupAdminDashboard();
@@ -243,6 +253,7 @@ function init(): void {
       currentTotalTickets = config.totalTickets;
       rebuildBoard(config.totalTickets);
       updateCounters(currentTaken.size, currentTotalTickets);
+      updateSheetData(currentTaken, currentTotalTickets);
     } else {
       currentTotalTickets = config.totalTickets;
     }

@@ -330,6 +330,148 @@ export function hideStickyCta(): void {
   if (stickyTimeout) { clearTimeout(stickyTimeout); stickyTimeout = null; }
 }
 
+/* ─── Bottom Sheet Number Selector ─── */
+let sheetSelectedNumber: number | null = null;
+let sheetTakenNumbers: Set<number> = new Set();
+let sheetTotalTickets = 100;
+
+export function setupNumberSheet(): void {
+  const btn = document.getElementById('chooseNumberBtn');
+  const closeBtn = document.getElementById('numberSheetClose');
+  const sheet = document.getElementById('numberSheet');
+  const backdrop = sheet?.querySelector('.number-sheet-backdrop');
+  const searchInput = document.getElementById('numberSearch') as HTMLInputElement;
+
+  btn?.addEventListener('click', () => openNumberSheet());
+  closeBtn?.addEventListener('click', () => closeNumberSheet());
+  backdrop?.addEventListener('click', () => closeNumberSheet());
+
+  searchInput?.addEventListener('input', () => {
+    filterSheetNumbers(searchInput.value);
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !sheet?.classList.contains('hidden')) {
+      closeNumberSheet();
+    }
+  });
+}
+
+function openNumberSheet(): void {
+  const sheet = document.getElementById('numberSheet');
+  sheet?.classList.remove('hidden');
+  document.body.style.overflow = 'hidden';
+
+  // Reset
+  sheetSelectedNumber = null;
+  updateSheetFooter();
+  const search = document.getElementById('numberSearch') as HTMLInputElement;
+  if (search) search.value = '';
+  filterSheetNumbers('');
+}
+
+function closeNumberSheet(): void {
+  const sheet = document.getElementById('numberSheet');
+  sheet?.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+export function openNumberSheetWithSelection(num: number): void {
+  openNumberSheet();
+  sheetSelectedNumber = num;
+  updateSheetCellHighlights();
+  updateSheetFooter();
+  // Scroll selected cell into view
+  requestAnimationFrame(() => {
+    const cell = document.querySelector(`.sheet-cell[data-num="${num}"]`) as HTMLElement;
+    cell?.scrollIntoView({ block: 'center', behavior: 'smooth' });
+  });
+}
+
+export function updateSheetData(taken: Set<number>, total: number): void {
+  sheetTakenNumbers = taken;
+  sheetTotalTickets = total;
+  renderSheetGrid();
+}
+
+function renderSheetGrid(): void {
+  const grid = document.getElementById('numberSheetGrid');
+  if (!grid) return;
+
+  grid.innerHTML = '';
+
+  for (let i = 0; i < sheetTotalTickets; i++) {
+    const cell = document.createElement('button');
+    const label = i.toString().padStart(2, '0');
+    const isTaken = sheetTakenNumbers.has(i);
+
+    cell.className = `sheet-cell ${isTaken ? 'sheet-cell-taken' : 'sheet-cell-available'}`;
+    if (i === sheetSelectedNumber && !isTaken) {
+      cell.classList.add('sheet-cell-selected');
+    }
+    cell.textContent = label;
+    cell.dataset.num = i.toString();
+    cell.type = 'button';
+
+    if (!isTaken) {
+      cell.addEventListener('click', () => {
+        sheetSelectedNumber = i;
+        updateSheetCellHighlights();
+        updateSheetFooter();
+      });
+    }
+
+    grid.appendChild(cell);
+  }
+}
+
+function updateSheetCellHighlights(): void {
+  const cells = document.querySelectorAll('.sheet-cell');
+  cells.forEach(cell => {
+    const num = parseInt((cell as HTMLElement).dataset.num || '-1', 10);
+    cell.classList.toggle('sheet-cell-selected', num === sheetSelectedNumber && !sheetTakenNumbers.has(num));
+  });
+}
+
+function updateSheetFooter(): void {
+  const footer = document.getElementById('numberSheetFooter');
+  const numEl = document.getElementById('numberSheetSelectedNum');
+  const confirmLink = document.getElementById('numberSheetConfirm');
+
+  if (sheetSelectedNumber !== null && !sheetTakenNumbers.has(sheetSelectedNumber)) {
+    footer?.classList.remove('hidden');
+    const label = sheetSelectedNumber.toString().padStart(2, '0');
+    if (numEl) numEl.textContent = `#${label}`;
+
+    const msg = encodeURIComponent(
+      `Hola quiero ganarme el premio y quiero jugar con el número ${label}`,
+    );
+    confirmLink?.setAttribute('href', `https://wa.me/${WHATSAPP_NUMBER}?text=${msg}`);
+
+    // Close sheet when user taps confirm (they're going to WhatsApp)
+    confirmLink?.addEventListener('click', () => {
+      setTimeout(() => closeNumberSheet(), 300);
+    }, { once: true });
+  } else {
+    footer?.classList.add('hidden');
+  }
+}
+
+function filterSheetNumbers(query: string): void {
+  const cells = document.querySelectorAll('.sheet-cell') as NodeListOf<HTMLElement>;
+  const q = query.trim();
+
+  cells.forEach(cell => {
+    const label = cell.textContent || '';
+    if (!q || label.includes(q)) {
+      cell.style.display = '';
+    } else {
+      cell.style.display = 'none';
+    }
+  });
+}
+
 /* ─── Draw Date Update ─── */
 export function updateDrawDate(isoDate: string): void {
   const el = document.getElementById('drawDate');
