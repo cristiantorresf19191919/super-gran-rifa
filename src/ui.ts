@@ -421,12 +421,24 @@ function renderSheetGrid(): void {
     cell.dataset.num = i.toString();
     cell.type = 'button';
 
-    // Always attach listener; check taken state at click time
+    // Prevent focus-induced scroll on desktop (mousedown default = focus)
+    cell.addEventListener('mousedown', (e) => e.preventDefault());
+
+    // On click: lock scroll position so button focus can't jump the grid
     cell.addEventListener('click', () => {
+      const g = document.getElementById('numberSheetGrid');
+      const scrollPos = g?.scrollTop ?? 0;
+
       if (sheetTakenNumbers.has(i)) return;
       sheetSelectedNumber = i;
       updateSheetCellHighlights();
       updateSheetFooter();
+
+      // Restore scroll — catches any focus-induced or reflow shift
+      if (g) {
+        g.scrollTop = scrollPos;
+        requestAnimationFrame(() => { g.scrollTop = scrollPos; });
+      }
     });
 
     grid.appendChild(cell);
