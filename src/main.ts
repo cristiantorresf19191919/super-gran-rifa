@@ -79,8 +79,16 @@ function initGame(): Phaser.Game {
 }
 
 /* ─── Board Event Handlers ─── */
+function isAnyModalOpen(): boolean {
+  const modals = document.querySelectorAll('.modal:not(.hidden), .number-sheet:not(.hidden)');
+  return modals.length > 0;
+}
+
 function setupBoardEvents(scene: BoardScene): void {
   scene.events.on(BOARD_EVENTS.NUMBER_CLICKED, (num: number) => {
+    // Ignore board clicks when any modal/sheet is already open
+    if (isAnyModalOpen()) return;
+
     if (isAdmin) {
       handleAdminClick(num);
     } else {
