@@ -1251,6 +1251,26 @@ body {
   border-color: rgba(255,215,0,0.4);
 }
 
+.btn-table-delete {
+  padding: 4px 10px;
+  border: 1px solid rgba(231,76,60,0.2);
+  border-radius: 12px;
+  background: rgba(231,76,60,0.08);
+  color: #e74c3c;
+  font-size: 0.82rem;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: var(--transition);
+}
+.btn-table-delete:hover {
+  background: rgba(231,76,60,0.2);
+  border-color: rgba(231,76,60,0.4);
+}
+.btn-table-delete:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
 /* Buyer form modal extras */
 .buyer-form-modal {
   max-width: 420px;

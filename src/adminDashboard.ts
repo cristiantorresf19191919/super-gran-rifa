@@ -3,7 +3,7 @@
    ============================================ */
 
 import type { BuyerInfo, RaffleConfig } from './database';
-import { saveBuyerInfo, updateRaffleConfig } from './database';
+import { saveBuyerInfo, updateRaffleConfig, toggleNumber } from './database';
 
 /* ─── State ─── */
 let currentBuyers: Record<string, BuyerInfo> = {};
@@ -177,6 +177,7 @@ function createDashboardHTML(): void {
                   <th>Pago</th>
                   <th>Tel</th>
                   <th></th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody id="buyersTableBody">
@@ -228,12 +229,17 @@ function createDashboardHTML(): void {
 }
 
 function wireEvents(): void {
-  // Close dashboard
-  document.addEventListener('click', (e) => {
-    const target = e.target as HTMLElement;
-    if (target.id === 'dashboardClose' || target.id === 'adminDashboard') {
-      hideDashboard();
-    }
+  // Close dashboard — direct listener on button (panel stopPropagation blocks delegation)
+  const closeBtn = document.getElementById('dashboardClose');
+  closeBtn?.addEventListener('click', (e) => {
+    e.stopPropagation();
+    hideDashboard();
+  });
+
+  // Close on overlay click (outside panel)
+  const overlay = document.getElementById('adminDashboard');
+  overlay?.addEventListener('click', (e) => {
+    if (e.target === overlay) hideDashboard();
   });
 
   // Prevent clicks inside panel from closing
@@ -277,10 +283,10 @@ function wireEvents(): void {
     buyerForm.addEventListener('submit', handleBuyerFormSubmit);
   }
 
-  // Buyers table — delegate click for edit/whatsapp
+  // Buyers table — delegate click for edit/delete/whatsapp
   const tableBody = document.getElementById('buyersTableBody');
   if (tableBody) {
-    tableBody.addEventListener('click', (e) => {
+    tableBody.addEventListener('click', async (e) => {
       const target = e.target as HTMLElement;
       const btn = target.closest('[data-action]') as HTMLElement | null;
       if (!btn) return;
@@ -289,6 +295,16 @@ function wireEvents(): void {
       if (action === 'edit') {
         const key = num.toString().padStart(2, '0');
         showBuyerForm(num, currentBuyers[key]);
+      } else if (action === 'delete') {
+        const label = num.toString().padStart(2, '0');
+        if (!confirm(`¿Liberar número ${label}? Se eliminará el registro del comprador.`)) return;
+        btn.textContent = '...';
+        (btn as HTMLButtonElement).disabled = true;
+        try {
+          await toggleNumber(num);
+        } catch (err) {
+          console.error('Error releasing number:', err);
+        }
       }
     });
   }
@@ -469,13 +485,15 @@ function renderBuyersTable(): void {
 
   if (sortedKeys.length === 0) {
     tbody.innerHTML =
-      '<tr class="buyers-empty"><td colspan="5">No hay compradores registrados</td></tr>';
+      '<tr class="buyers-empty"><td colspan="6">No hay compradores registrados</td></tr>';
     return;
   }
 
   tbody.innerHTML = sortedKeys
     .map((key) => {
+      const num = parseInt(key, 10);
       const buyer = currentBuyers[key];
+      const deleteBtn = `<button class="btn-table-delete" data-action="delete" data-num="${num}" title="Liberar número">🗑</button>`;
       if (buyer) {
         const name = `${buyer.firstName} ${buyer.lastName.charAt(0)}.`;
         const paid = formatCOP(buyer.amountPaid);
@@ -485,7 +503,8 @@ function renderBuyersTable(): void {
           <td>${escapeHtml(name)}</td>
           <td>${paid}</td>
           <td><a href="${waLink}" target="_blank" rel="noopener" class="wa-table-link" title="${escapeHtml(buyer.phone)}">📱</a></td>
-          <td><button class="btn-table-edit" data-action="edit" data-num="${parseInt(key, 10)}">Editar</button></td>
+          <td><button class="btn-table-edit" data-action="edit" data-num="${num}">Editar</button></td>
+          <td>${deleteBtn}</td>
         </tr>`;
       } else {
         // Taken but no buyer info
@@ -494,7 +513,8 @@ function renderBuyersTable(): void {
           <td class="text-muted">Sin registro</td>
           <td>—</td>
           <td>—</td>
-          <td><button class="btn-table-edit" data-action="edit" data-num="${parseInt(key, 10)}">Agregar</button></td>
+          <td><button class="btn-table-edit" data-action="edit" data-num="${num}">Agregar</button></td>
+          <td>${deleteBtn}</td>
         </tr>`;
       }
     })
