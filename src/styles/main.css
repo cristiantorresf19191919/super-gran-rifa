@@ -1325,3 +1325,460 @@ body {
     font-size: 0.75rem;
   }
 }
+
+/* ============================================
+   ENGAGEMENT FEATURES
+   ============================================ */
+
+/* ─── LIVE COUNTDOWN TIMER ─── */
+.countdown-section {
+  text-align: center;
+  margin: 8px 0 10px;
+  padding: 14px 12px;
+  background: linear-gradient(135deg, rgba(255,215,0,0.06), rgba(255,140,0,0.08));
+  border: 1px solid rgba(255,215,0,0.12);
+  border-radius: var(--radius);
+}
+.countdown-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.45);
+  margin-bottom: 8px;
+}
+.countdown-grid {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.countdown-unit { text-align: center }
+.countdown-digit {
+  display: block;
+  font-family: var(--font-numbers);
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--gold);
+  line-height: 1;
+  min-width: 48px;
+  transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.countdown-digit.cd-flip { transform: scaleY(0.8); }
+.countdown-digit.cd-pulse { animation: cdPulse 0.3s ease-out; }
+@keyframes cdPulse { 0%{transform:scale(1.15);color:#fff} 100%{transform:scale(1);color:var(--gold)} }
+.countdown-tag {
+  display: block;
+  font-size: 0.6rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: rgba(255,255,255,0.35);
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+.countdown-sep {
+  font-family: var(--font-numbers);
+  font-size: 1.5rem;
+  color: rgba(255,215,0,0.3);
+  margin: 0 2px;
+  align-self: flex-start;
+  padding-top: 4px;
+}
+
+@media (max-width: 380px) {
+  .countdown-digit { font-size: 1.4rem; min-width: 38px }
+  .countdown-sep { font-size: 1.1rem }
+}
+
+/* ─── LIVE VIEWERS BADGE ─── */
+.live-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-left: 8px;
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.5);
+  background: rgba(255,255,255,0.04);
+  padding: 2px 8px;
+  border-radius: 20px;
+}
+.live-dot {
+  width: 6px; height: 6px;
+  background: #22c55e;
+  border-radius: 50%;
+  animation: livePulse 2s ease-in-out infinite;
+}
+@keyframes livePulse {
+  0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(34,197,94,0.6)}
+  50%{opacity:0.7;box-shadow:0 0 0 4px rgba(34,197,94,0)}
+}
+
+/* ─── ROI MULTIPLIER ─── */
+.roi-section {
+  margin: 8px 0 12px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(34,197,94,0.06), rgba(255,215,0,0.08));
+  border: 1px solid rgba(34,197,94,0.15);
+  border-radius: var(--radius);
+}
+.roi-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+.roi-left {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 0.82rem; font-weight: 600;
+}
+.roi-invest { color: rgba(255,255,255,0.6) }
+.roi-arrow { color: var(--gold); font-size: 1.1rem }
+.roi-win { color: #22c55e; font-weight: 800 }
+.roi-multiplier-wrap { text-align: right }
+.roi-multiplier {
+  font-family: var(--font-numbers);
+  font-size: 2rem;
+  font-weight: 900;
+  background: linear-gradient(135deg, #22c55e, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1;
+}
+.roi-label { display: block; font-size: 0.65rem; color: rgba(255,255,255,0.4); font-weight: 600 }
+.roi-bar-track {
+  height: 6px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.roi-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e, var(--gold));
+  border-radius: 3px;
+  transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@media (max-width: 640px) {
+  .roi-content { flex-direction: column; gap: 6px; text-align: center }
+  .roi-multiplier-wrap { text-align: center }
+  .roi-left { flex-wrap: wrap; justify-content: center }
+}
+
+/* ─── HOW IT WORKS ─── */
+.section-title {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  text-align: center;
+  color: var(--gold);
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+}
+.how-section { margin: 24px 0 20px }
+.steps-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.step-card {
+  position: relative;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius);
+  padding: 20px 14px;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(20px);
+  transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.step-card.step-visible { opacity: 1; transform: translateY(0) }
+.step-card:nth-child(2) { transition-delay: 0.15s }
+.step-card:nth-child(3) { transition-delay: 0.3s }
+.step-icon { font-size: 2rem; margin-bottom: 8px }
+.step-num {
+  position: absolute; top: -10px; left: 50%; transform: translateX(-50%);
+  width: 24px; height: 24px; background: var(--gold); color: #000;
+  border-radius: 50%; font-size: 0.7rem; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 2px 8px rgba(255,215,0,0.4);
+}
+.step-card h3 {
+  font-size: 0.88rem; font-weight: 700; color: #fff; margin-bottom: 6px;
+}
+.step-card p {
+  font-size: 0.75rem; color: rgba(255,255,255,0.5); line-height: 1.5;
+}
+
+@media (max-width: 640px) {
+  .steps-grid { grid-template-columns: 1fr; max-width: 320px; margin: 0 auto }
+}
+
+/* ─── BIRTHDAY LUCKY NUMBER ─── */
+.birthday-section { margin: 20px 0 }
+.birthday-card {
+  background: linear-gradient(135deg, rgba(147,51,234,0.08), rgba(255,215,0,0.06));
+  border: 1px solid rgba(147,51,234,0.15);
+  border-radius: var(--radius);
+  padding: 20px;
+  text-align: center;
+}
+.birthday-header { margin-bottom: 14px }
+.birthday-icon { font-size: 2rem; display: block; margin-bottom: 6px }
+.birthday-header h3 {
+  font-family: var(--font-display);
+  font-size: 1rem; color: var(--gold); margin-bottom: 4px;
+}
+.birthday-header p { font-size: 0.78rem; color: rgba(255,255,255,0.5); line-height: 1.4 }
+.birthday-form {
+  display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;
+}
+.birthday-input {
+  padding: 10px 16px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.12);
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  outline: none;
+  transition: var(--transition);
+}
+.birthday-input:focus { border-color: rgba(147,51,234,0.5); box-shadow: 0 0 0 3px rgba(147,51,234,0.15) }
+.birthday-input::-webkit-calendar-picker-indicator { filter: invert(0.7) }
+.birthday-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #9333ea, #7c3aed);
+  border: none;
+  border-radius: var(--radius-sm);
+  color: #fff;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: var(--transition);
+}
+.birthday-btn:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(147,51,234,0.4) }
+.birthday-result { margin-top: 16px; min-height: 0; transition: all 0.4s ease }
+.birthday-result-visible { min-height: 120px }
+.birthday-reveal { animation: birthdayReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) }
+@keyframes birthdayReveal { from{opacity:0;transform:scale(0.7)} to{opacity:1;transform:scale(1)} }
+.birthday-stars { font-size: 1.5rem; animation: rotateStar 2s linear infinite }
+@keyframes rotateStar { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+.birthday-num {
+  font-family: var(--font-numbers);
+  font-size: 3rem; font-weight: 900;
+  background: linear-gradient(135deg, #9333ea, var(--gold));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 4px 0;
+}
+.birthday-msg { font-size: 0.82rem; color: rgba(255,255,255,0.5); margin-bottom: 10px }
+.birthday-cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 24px;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  color: #fff; text-decoration: none;
+  border-radius: var(--radius-sm);
+  font-weight: 700; font-size: 0.85rem;
+  transition: var(--transition);
+}
+.birthday-cta:hover { transform: scale(1.03); box-shadow: 0 4px 16px rgba(34,197,94,0.4) }
+
+.shake { animation: shakeInput 0.4s ease-in-out }
+@keyframes shakeInput { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+
+/* ─── TESTIMONIALS ─── */
+.testimonials-section { margin: 24px 0 16px }
+.testimonial-card {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: var(--radius);
+  padding: 24px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.testimonial-quote {
+  position: absolute; top: 12px; left: 16px; opacity: 0.4;
+}
+.testimonial-text {
+  font-size: 0.92rem;
+  font-style: italic;
+  color: rgba(255,255,255,0.8);
+  line-height: 1.6;
+  margin-bottom: 10px;
+  min-height: 48px;
+}
+.testimonial-text.testimonial-fade-in {
+  animation: testimonialFade 0.5s ease-out;
+}
+@keyframes testimonialFade { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+.testimonial-author {
+  font-size: 0.78rem;
+  color: var(--gold);
+  font-weight: 600;
+}
+.testimonial-dots {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 12px;
+}
+.testimonial-dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.15);
+  border: none;
+  cursor: pointer;
+  transition: var(--transition);
+  padding: 0;
+}
+.testimonial-dot.active { background: var(--gold); transform: scale(1.3) }
+.testimonial-dot:hover { background: rgba(255,215,0,0.5) }
+
+/* ─── SOCIAL PROOF TOASTS ─── */
+.toast-container {
+  position: fixed;
+  bottom: 80px; left: 16px;
+  z-index: 800;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: none;
+}
+.social-toast {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 16px;
+  background: rgba(11,22,40,0.92);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,215,0,0.15);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateX(-120%);
+  opacity: 0;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: auto;
+  max-width: 320px;
+}
+.social-toast.toast-visible { transform: translateX(0); opacity: 1 }
+.social-toast.toast-exit { transform: translateX(-120%); opacity: 0 }
+.toast-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 800; font-size: 0.8rem; color: #000;
+  flex-shrink: 0;
+}
+.toast-body {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: rgba(255,255,255,0.7);
+}
+.toast-body strong { color: #fff }
+.toast-action { display: block }
+.toast-number { color: var(--gold); font-weight: 700; font-family: var(--font-numbers) }
+.toast-time { font-size: 0.65rem; color: rgba(255,255,255,0.3) }
+
+@media (max-width: 640px) {
+  .toast-container { left: 8px; right: 8px; bottom: 70px }
+  .social-toast { max-width: 100% }
+}
+
+/* ─── MILESTONE CELEBRATIONS ─── */
+.milestone-container {
+  position: fixed;
+  top: 60px;
+  left: 50%; transform: translateX(-50%);
+  z-index: 850;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  pointer-events: none;
+}
+.milestone-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+  transform: translateY(-40px) scale(0.9);
+  opacity: 0;
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: auto;
+  white-space: nowrap;
+}
+.milestone-banner.milestone-visible { transform: translateY(0) scale(1); opacity: 1 }
+.milestone-banner.milestone-exit { transform: translateY(-40px) scale(0.9); opacity: 0 }
+.milestone-25 { background: linear-gradient(135deg, #22c55e, #16a34a) }
+.milestone-50 { background: linear-gradient(135deg, #f97316, #ea580c) }
+.milestone-75 { background: linear-gradient(135deg, #ef4444, #dc2626) }
+.milestone-90 { background: linear-gradient(135deg, #dc2626, #991b1b); animation: milestoneShake 0.5s ease-in-out 0.5s }
+.milestone-emoji { font-size: 1.2rem }
+.milestone-text { font-size: 0.82rem }
+@keyframes milestoneShake { 0%,100%{transform:translateY(0) scale(1)} 25%{transform:translateY(-3px) scale(1.02)} 75%{transform:translateY(3px) scale(0.98)} }
+
+/* ─── SHARE MODAL ─── */
+.share-modal { max-width: 380px }
+.share-card {
+  margin: 16px 0;
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.share-card-inner {
+  position: relative;
+  background: linear-gradient(135deg, #0d2137, #1a3a5c);
+  padding: 28px 24px;
+  text-align: center;
+  border: 2px solid rgba(255,215,0,0.2);
+  border-radius: var(--radius);
+}
+.share-card-glow {
+  position: absolute;
+  top: 50%; left: 50%;
+  width: 120px; height: 120px;
+  background: radial-gradient(circle, rgba(255,215,0,0.15), transparent 70%);
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+.share-card-brand {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  color: var(--gold);
+  letter-spacing: 0.2em;
+  margin-bottom: 8px;
+}
+.share-card-number {
+  font-family: var(--font-numbers);
+  font-size: 3.5rem;
+  font-weight: 900;
+  color: var(--gold);
+  text-shadow: 0 0 30px rgba(255,215,0,0.3);
+}
+.share-card-message { font-size: 0.85rem; color: rgba(255,255,255,0.7); margin: 6px 0 }
+.share-card-prize { font-size: 0.9rem; color: #22c55e; font-weight: 700 }
+.share-card-url { font-size: 0.65rem; color: rgba(255,255,255,0.25); margin-top: 8px }
+.share-buttons {
+  display: flex; gap: 8px; flex-wrap: wrap;
+}
+.share-btn-action {
+  flex: 1; min-width: 100px;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+  padding: 10px 14px;
+  border: none; border-radius: var(--radius-sm);
+  font-family: var(--font-body);
+  font-size: 0.78rem; font-weight: 700;
+  cursor: pointer; color: #fff;
+  transition: var(--transition);
+}
+.share-btn-action:hover { transform: scale(1.03) }
+.share-wa { background: #25d366 }
+.share-tw { background: #1d9bf0 }
+.share-copy { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15) }

@@ -32,6 +32,20 @@ import {
   openNumberSheetWithSelection,
   openAdminSheetWithSelection,
 } from './ui';
+import {
+  setupCountdown,
+  updateCountdownTarget,
+  setupSocialProof,
+  updateProofTakenNumbers,
+  setupBirthdayPicker,
+  updateROIDisplay,
+  checkMilestones,
+  setupTestimonials,
+  setupShareCard,
+  setupShareModalClose,
+  setupHowItWorks,
+  setupLiveStats,
+} from './features';
 
 /* ─── State ─── */
 let isAdmin = false;
@@ -156,6 +170,10 @@ function setupDataListener(): void {
     // Update bottom sheet grid
     updateSheetData(taken, currentTotalTickets);
 
+    // Update engagement features
+    updateProofTakenNumbers(taken);
+    checkMilestones(taken.size, currentTotalTickets);
+
     // Pipe data to admin dashboard
     updateDashboardData(data.buyers || {}, data.takenNumbers || {});
   });
@@ -223,6 +241,16 @@ function init(): void {
     dashboardBtn.addEventListener('click', showDashboard);
   }
 
+  // Setup engagement features
+  setupCountdown();
+  setupSocialProof();
+  setupTestimonials();
+  setupShareCard();
+  setupShareModalClose();
+  setupHowItWorks();
+  setupLiveStats();
+  setupBirthdayPicker(currentTotalTickets, currentTaken);
+
   // Setup auth
   setupAuth();
 
@@ -235,6 +263,8 @@ function init(): void {
     updateDrawDate(config.drawDate);
     updateDynamicTexts(config.totalTickets, config.ticketPrice);
     updateDashboardConfig(config);
+    updateCountdownTarget(config.drawDate);
+    updateROIDisplay(config.prizeAmount, config.ticketPrice);
 
     if (config.totalTickets !== currentTotalTickets) {
       currentTotalTickets = config.totalTickets;
